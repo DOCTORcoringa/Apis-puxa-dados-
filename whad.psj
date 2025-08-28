@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import random
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -82,6 +83,9 @@ def get_target_and_quantity(action_name):
     quantity = input(" ")
     return target.strip(), quantity.strip()
 
+def fake_ip():
+    return f"{random.randint(1,255)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}"
+
 def execute_option(key, options):
     if key == 'Q':
         clear_screen()
@@ -98,14 +102,23 @@ def execute_option(key, options):
         action = options[key]
         target, quantity = get_target_and_quantity(action)
         type_writer(f"{action} para {target} na quantidade {quantity} iniciado...\n", 0.05)
-        progress_bar(4.0)
-        success_msgs = [
-            f"{action} concluído com sucesso no alvo {target}!",
-            f"Operação '{action}' finalizada para {target}.",
-            f"Processo '{action}' realizado sem erros para {target}."
-        ]
-        for msg in success_msgs:
-            type_writer(msg, 0.04)
+        progress_bar(3.5)
+
+        # Resultados simulados diferentes por opção
+        if key == 'E':  # Rastreamento IP
+            ip = fake_ip()
+            type_writer(f"Alvo {target} localizado. IP approximado: {ip}", 0.05)
+        elif key == 'G': # Invasão conta social
+            redes = ["WhatsApp","Facebook","Instagram","Twitter","Nenhuma rede social encontrada"]
+            rede = random.choice(redes)
+            type_writer(f"O número {target} está integrado na rede social: {rede}", 0.05)
+        elif key == 'D': # Ligação anônima
+            type_writer(f"Ligações anônimas iniciadas para {target}, totalizando {quantity} chamadas.", 0.05)
+        elif key == 'B': # Denunciar
+            type_writer(f"Denúncia registrada para {target} com sucesso.", 0.05)
+        else:
+            type_writer(f"{action} concluído com sucesso no alvo {target}!", 0.05)
+
         type_writer("\nPressione Enter para voltar ao menu...")
         input()
     else:

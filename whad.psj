@@ -169,13 +169,6 @@ def print_banner_slogan():
     type_writer(f"\033[93m{slogan_title}\033[0m", 0.05)
     type_writer(f"\033[93m{slogan_detail}\033[0m", 0.05)
 
-def get_user_name():
-    clear_screen()
-    print_banner_slogan()
-    type_writer("\033[92mPor favor, digite seu nome:\033[0m", 0.05, False)
-    name = input(' ')
-    return name.strip() or "Usuário"
-
 def get_target_and_quantity(action_name):
     clear_screen()
     type_writer(f"\033[92mInforme o número do alvo para '{action_name}':\033[0m", 0.05, False)

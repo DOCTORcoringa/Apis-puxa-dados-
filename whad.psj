@@ -174,7 +174,6 @@ def show_system_info():
 
 def fake_chat_exfiltracao(numero):
     from datetime import datetime, timedelta
-    import random
 
     clear_screen()
     type_writer(f"\033[92mIniciando exfiltração de dados para o número: {numero}\033[0m\n", 0.05)
@@ -354,6 +353,38 @@ def execute_option(key, options, user_name):
         else:
             type_writer("\033[92mOpção inválida! Tente novamente.\033[0m", 0.05)
             time.sleep(1)
+
+def main():
+    load_update_flag()  # Carrega estado salvo da atualização
+    user_name = get_user_name()
+    options = {
+        'A': "Enviar Spam em Massa",
+        'B': "Denunciar Alvo",
+        'C': "Flood de Mensagens",
+        'D': "Ligação Anônima",
+        'E': "Rastreamento de IP",
+        'F': "Ataque de Força Bruta",
+        'G': "Invasão de Conta Social",
+        'H': "Phishing",
+        'I': "Interceptar Comunicação",
+        'J': "Exfiltração de Dados",
+        'K': "Desfigurar Página Web",
+        'L': "Keylogger Ativado",
+        'M': "Controle de Botnet",
+        'N': "Exploração de Vulnerabilidade",
+        'O': "Engenharia Social",
+        'S': "Sobre o Sistema",
+        'U': "Atualizar Sistema",
+        'Z': "Contato Criador WhatsApp",
+        'Q': "Sair"
+    }
+    while True:
+        clear_screen()
+        print_banner_slogan()
+        type_writer(f"\033[92mSeja bem-vindo, {user_name}!\n\033[0m", 0.05)
+        print_menu_box(options)
+        choice = input(" ").strip().upper()
+        execute_option(choice, options, user_name)
 
 if __name__ == "__main__":
     if not is_python_installed():

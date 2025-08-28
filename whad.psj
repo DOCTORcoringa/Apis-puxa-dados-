@@ -3,10 +3,44 @@ import sys
 import time
 import random
 import subprocess
+import json
 
 # Variável global para controle do banner/slogan atualizado
 use_updated_slogan = False
 
+# Funções para gerenciar usuários e histórico
+def carregar_usuarios():
+    if os.path.exists("usuarios.json"):
+        with open("usuarios.json", "r") as f:
+            return json.load(f)
+    return {}
+
+def salvar_usuarios(usuarios):
+    with open("usuarios.json", "w") as f:
+        json.dump(usuarios, f, indent=4)
+
+def obter_nome_usuario():
+    usuarios = carregar_usuarios()
+    while True:
+        nome = input("Digite seu nome: ").strip()
+        if nome:
+            break
+    if nome in usuarios:
+        print(f"\n\033[92mSeja bem-vindo de volta, {nome}!\033[0m")
+        ultima_opcao = usuarios[nome].get("ultima_opcao")
+        if ultima_opcao:
+            print(f"\033[93mSua última opção usada foi: {ultima_opcao}\033[0m\n")
+    else:
+        usuarios[nome] = {"ultima_opcao": None}
+        salvar_usuarios(usuarios)
+        print(f"\n\033[92mOlá {nome}, seja bem-vindo(a)!\033[0m\n")
+    return nome, usuarios
+
+def salvar_ultima_opcao(nome, opcao, usuarios):
+    usuarios[nome]["ultima_opcao"] = opcao
+    salvar_usuarios(usuarios)
+
+# Demais funções do sistema e nomes principais
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -37,41 +71,6 @@ def progress_bar(duration=3.0, length=30):
             break
         time.sleep(0.1)
     print()
-
-def progress_bar_installacao(duration=5.0):
-    length = 30
-    start = time.time()
-    while True:
-        elapsed = time.time() - start
-        percent = min(elapsed / duration, 1.0)
-        filled = int(percent * length)
-        bar = '█' * filled + '-' * (length - filled)
-        sys.stdout.write(f'\r\033[92mInstalando... [{bar}] {int(percent*100)}%\033[0m')
-        sys.stdout.flush()
-        if percent == 1.0:
-            break
-        time.sleep(0.1)
-    print()
-
-def save_update_flag():
-    try:
-        with open("config.txt", "w") as f:
-            f.write("updated=True\n")
-    except Exception as e:
-        pass
-
-def load_update_flag():
-    global use_updated_slogan
-    try:
-        with open("config.txt", "r") as f:
-            lines = f.readlines()
-            for line in lines:
-                if line.strip() == "updated=True":
-                    use_updated_slogan = True
-                    return
-        use_updated_slogan = False
-    except FileNotFoundError:
-        use_updated_slogan = False
 
 def print_banner_slogan():
     if use_updated_slogan:
@@ -105,148 +104,6 @@ def print_banner_slogan():
     type_writer(f"\033[93m{slogan_title}\033[0m", 0.05)
     type_writer(f"\033[93m{slogan_detail}\033[0m", 0.05)
 
-def get_user_name():
-    clear_screen()
-    print_banner_slogan()
-    type_writer("\033[92mPor favor, digite seu nome:\033[0m", 0.05, False)
-    name = input(' ')
-    return name.strip() or "Usuário"
-
-def print_menu_box(options):
-    lines = [f"{key}) {options[key]}" for key in sorted(options.keys())]
-    width = max(len(line) for line in lines) + 4
-    
-    print('\033[92m' + '╔' + '═' * width + '╗' + '\033[0m')
-    type_writer("\033[92m===== MENU HACKER STYLE =====\033[0m", 0.02)
-    for line in lines:
-        line_padded = line.ljust(width)
-        print(f'\033[92m║ {line_padded} ║\033[0m')
-    print('\033[92m' + '╚' + '═' * width + '╝' + '\033[0m')
-
-    type_writer("\n\033[92mDigite a letra da opção desejada:\033[0m", 0.05, False)
-
-def get_target_and_quantity(action_name):
-    clear_screen()
-    type_writer(f"\033[92mInforme o número do alvo para '{action_name}':\033[0m", 0.05, False)
-    target = input(" ")
-    type_writer(f"\033[92mInforme a quantidade para '{action_name}':\033[0m", 0.05, False)
-    quantity = input(" ")
-    return target.strip(), quantity.strip()
-
-def get_flood_data():
-    clear_screen()
-    type_writer("\033[92mInforme o número do alvo para 'Flood de Mensagens':\033[0m", 0.05, False)
-    target = input(" ")
-    type_writer("\033[92mDigite a mensagem que deseja enviar:\033[0m", 0.05, False)
-    mensagem = input(" ")
-    type_writer("\033[92mInforme a quantidade de mensagens a enviar:\033[0m", 0.05, False)
-    quantidade = input(" ")
-    return target.strip(), mensagem.strip(), quantidade.strip()
-
-def fake_ip():
-    return f"{random.randint(1,255)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}"
-
-def show_system_info():
-    clear_screen()
-    mensagem = (
-        "AVISO IMPORTANTE:\n\n"
-        "Este sistema NÃO tem a capacidade de banir\n"
-        "ou bloquear nenhum usuário ou número.\n\n"
-        "Banir um número não é feito por este programa,\n"
-        "nem está dentro da sua programação ou jurisdição.\n\n"
-        "Ele apenas automatiza o envio de denúncias variadas\n"
-        "para um número específico, aumentando a quantidade\n"
-        "de denúncias enviadas.\n\n"
-        "Assim, ajuda a acelerar o processo para que\n"
-        "o WhatsApp identifique mais rápido um número\n"
-        "potencialmente problemático, por meio da\n"
-        "multiplicação automática das denúncias.\n\n"
-        "Ou seja, este é um auxílio para reforçar as denúncias\n"
-        "recebidas pelo WhatsApp, mas o banimento depende\n"
-        "exclusivamente da avaliação da plataforma.\n\n"
-        "Use este sistema com responsabilidade e dentro\n"
-        "dos limites legais e éticos.\n\n"
-        "Inscreva-se, esse código foi baseado pelo meu."
-    )
-    type_writer_lines(f"\033[92m{mensagem}\033[0m")
-    type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m")
-    input()
-
-def fake_chat_exfiltracao(numero):
-    from datetime import datetime, timedelta
-
-    clear_screen()
-    type_writer(f"\033[92mIniciando exfiltração de dados para o número: {numero}\033[0m\n", 0.05)
-    time.sleep(1.5)
-
-    emails = ["exemplo@gmail.com", "usuario@yahoo.com", "contato@hotmail.com", "nome.sobrenome@outlook.com"]
-    locais = ["São Paulo, Brasil", "Rio de Janeiro, Brasil", " Belo Horizonte, Brasil", "Porto Alegre, Brasil"]
-
-    email = random.choice(emails)
-    local = random.choice(locais)
-    data_exfiltrada = datetime.now() - timedelta(days=random.randint(1,100))
-
-    type_writer(f"[Sistema] Dados exfiltrados em {data_exfiltrada.strftime('%d/%m/%Y %H:%M:%S')}:\n", 0.03)
-    type_writer(f"Nome: Não encontrado", 0.03)
-    type_writer(f"E-mail: {email}", 0.03)
-    type_writer(f"Localização aproximada: {local}", 0.03)
-    type_writer(f"Número de telefone: {numero}\n", 0.03)
-
-    type_writer("Redes sociais associadas: Não encontrado\n", 0.03)
-
-    mensagens = [
-        "Mensagem recebida em segredo.",
-        "Última atividade detectada há 2 dias.",
-        "Comunicações criptografadas registradas.",
-        "Dados de conexão avaliados.",
-        "Nenhuma mensagem pública encontrada."
-    ]
-
-    type_writer("Histórico de mensagens capturadas:", 0.03)
-    n_msgs = random.randint(3, 5)
-    now = datetime.now()
-    for i in range(n_msgs):
-        hora_msg = (now - timedelta(hours=n_msgs - i)).strftime("%H:%M")
-        msg = random.choice(mensagens)
-        type_writer(f"[{hora_msg}] Mensagem: {msg}", 0.02)
-    type_writer("")
-    type_writer("[Sistema] Exfiltração concluída.", 0.05)
-    type_writer("\nPressione Enter para voltar ao menu.", 0.05)
-    input()
-
-def is_python_installed():
-    try:
-        subprocess.run(['python3', '--version'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return True
-    except Exception:
-        return False
-
-def install_essential_tools():
-    clear_screen()
-    print_banner_slogan()
-    type_writer_lines("\033[92mPara executar este script, você precisa das seguintes ferramentas instaladas no Termux:\n1) Atualizar sistema (pkg update && pkg upgrade)\n2) Instalar Python (pkg install python)\n\033[0m")
-    type_writer("\033[92mDeseja instalar automaticamente essas ferramentas? (S/N):\033[0m", 0.05, False)
-    resposta = input(" ").strip().lower()
-    
-    if resposta == 's':
-        type_writer("\n\033[92mIniciando atualização do sistema...\033[0m", 0.05)
-        progress_bar_installacao(duration=4)
-        os.system('pkg update -y && pkg upgrade -y')
-        
-        type_writer("\n\033[92mInstalando Python...\033[0m", 0.05)
-        progress_bar_installacao(duration=3)
-        os.system('pkg install python -y')
-        
-        type_writer("\n\033[92mInstalação concluída! Reinicie o Termux para garantir o funcionamento.\033[0m")
-        type_writer("\033[92mPressione Enter para continuar...\033[0m")
-        input()
-    else:
-        type_writer("\033[92mVocê pode instalar manualmente executando:\n", 0.05)
-        type_writer("pkg update && pkg upgrade", 0.05)
-        type_writer("pkg install python\n", 0.05)
-        type_writer("Pressione Enter para continuar...\033[0m", 0.05)
-        input()
-
 def update_system():
     global use_updated_slogan
     if use_updated_slogan:
@@ -267,7 +124,9 @@ def update_system():
     type_writer("\033[92mPressione Enter para voltar ao menu.\033[0m")
     input()
 
-def execute_option(key, options, user_name):
+def execute_option(key, options, user_name, usuarios):
+    salvar_ultima_opcao(user_name, key, usuarios)  # Salva a opção selecionada
+    
     if key == 'Q':
         clear_screen()
         print_banner_slogan()
@@ -355,8 +214,9 @@ def execute_option(key, options, user_name):
             time.sleep(1)
 
 def main():
+    global use_updated_slogan
     load_update_flag()  # Carrega estado salvo da atualização
-    user_name = get_user_name()
+    user_name, usuarios = obter_nome_usuario()
     options = {
         'A': "Enviar Spam em Massa",
         'B': "Denunciar Alvo",
@@ -384,9 +244,10 @@ def main():
         type_writer(f"\033[92mSeja bem-vindo, {user_name}!\n\033[0m", 0.05)
         print_menu_box(options)
         choice = input(" ").strip().upper()
-        execute_option(choice, options, user_name)
+        execute_option(choice, options, user_name, usuarios)
 
 if __name__ == "__main__":
     if not is_python_installed():
         install_essential_tools()
     main()
+w

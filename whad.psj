@@ -85,7 +85,7 @@ def get_user_name():
     return name.strip() or "Usuário"
 
 def get_target_and_quantity(action_name):
-    print_banner_slogan()
+    clear_screen()
     type_writer(f"\033[92mInforme o número do alvo para '{action_name}':\033[0m", 0.05, False)
     target = input(" ")
     type_writer(f"\033[92mInforme a quantidade para '{action_name}':\033[0m", 0.05, False)
@@ -93,7 +93,7 @@ def get_target_and_quantity(action_name):
     return target.strip(), quantity.strip()
 
 def get_flood_data():
-    print_banner_slogan()
+    clear_screen()
     type_writer("\033[92mInforme o número do alvo para 'Flood de Mensagens':\033[0m", 0.05, False)
     target = input(" ")
     type_writer("\033[92mDigite a mensagem que deseja enviar:\033[0m", 0.05, False)
@@ -107,45 +107,48 @@ def fake_ip():
 
 def show_system_info():
     clear_screen()
-    print_banner_slogan()
-    mensagem = """
-AVISO IMPORTANTE:
-
-Este sistema NÃO tem a capacidade de banir ou bloquear nenhum usuário ou número.
-
-Banir um número não é feito por este programa, nem está dentro da sua programação ou jurisdição.
-
-Ele apenas automatiza o envio de denúncias variadas para um número específico, aumentando a quantidade de denúncias enviadas.
-
-Assim, ajuda a acelerar o processo para que o WhatsApp identifique mais rápido um número potencialmente problemático, 
-por meio da multiplicação automática das denúncias.
-
-Ou seja, este é um auxílio para reforçar as denúncias recebidas pelo WhatsApp, mas o banimento depende exclusivamente da avaliação da plataforma.
-
-Use este sistema com responsabilidade e dentro dos limites legais e éticos.
-
-Inscreva-se, esse código foi baseado pelo meu.
-"""
+    # Não chama banner aqui para melhor foco texto e evitar bordas
+    mensagem = (
+        "AVISO IMPORTANTE:\n\n"
+        "Este sistema NÃO tem a capacidade de banir\n"
+        "ou bloquear nenhum usuário ou número.\n\n"
+        "Banir um número não é feito por este programa,\n"
+        "nem está dentro da sua programação ou jurisdição.\n\n"
+        "Ele apenas automatiza o envio de denúncias variadas\n"
+        "para um número específico, aumentando a quantidade\n"
+        "de denúncias enviadas.\n\n"
+        "Assim, ajuda a acelerar o processo para que\n"
+        "o WhatsApp identifique mais rápido um número\n"
+        "potencialmente problemático, por meio da\n"
+        "multiplicação automática das denúncias.\n\n"
+        "Ou seja, este é um auxílio para reforçar as denúncias\n"
+        "recebidas pelo WhatsApp, mas o banimento depende\n"
+        "exclusivamente da avaliação da plataforma.\n\n"
+        "Use este sistema com responsabilidade e dentro\n"
+        "dos limites legais e éticos.\n\n"
+        "Inscreva-se, esse código foi baseado pelo meu."
+    )
     type_writer_lines(f"\033[92m{mensagem}\033[0m")
+    type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m")
+    input()
 
 def fake_chat_exfiltracao(numero):
     from datetime import datetime, timedelta
     import random
 
     clear_screen()
-    print_banner_slogan()
+    # Não chama banner para melhor foco texto de exfiltração
     type_writer(f"\033[92mIniciando exfiltração de dados para o número: {numero}\033[0m\n", 0.05)
     time.sleep(1.5)
 
     emails = ["exemplo@gmail.com", "usuario@yahoo.com", "contato@hotmail.com", "nome.sobrenome@outlook.com"]
-    locais = ["São Paulo, Brasil", "Rio de Janeiro, Brasil", "Belo Horizonte, Brasil", "Porto Alegre, Brasil"]
+    locais = ["São Paulo, Brasil", "Rio de Janeiro, Brasil", " Belo Horizonte, Brasil", "Porto Alegre, Brasil"]
 
     email = random.choice(emails)
     local = random.choice(locais)
     data_exfiltrada = datetime.now() - timedelta(days=random.randint(1,100))
 
     type_writer(f"[Sistema] Dados exfiltrados em {data_exfiltrada.strftime('%d/%m/%Y %H:%M:%S')}:\n", 0.03)
-
     type_writer(f"Nome: Não encontrado", 0.03)
     type_writer(f"E-mail: {email}", 0.03)
     type_writer(f"Localização aproximada: {local}", 0.03)
@@ -169,7 +172,6 @@ def fake_chat_exfiltracao(numero):
         msg = random.choice(mensagens)
         type_writer(f"[{hora_msg}] Mensagem: {msg}", 0.02)
     type_writer("")
-
     type_writer("[Sistema] Exfiltração concluída.", 0.05)
     type_writer("\nPressione Enter para voltar ao menu.", 0.05)
     input()
@@ -239,25 +241,20 @@ def execute_option(key, options, user_name):
         input()
     elif key == 'J':  # Exfiltração de Dados (fake chat)
         clear_screen()
-        print_banner_slogan()
         type_writer("\033[92mInforme o número alvo para exfiltração:\033[0m", 0.05, False)
         numero = input(" ").strip()
         fake_chat_exfiltracao(numero)
     elif key == 'O':  # Engenharia Social explicação e direcionamento WhatsApp
         clear_screen()
-        print_banner_slogan()
-        explicacao = """
-Engenharia Social é uma técnica que envolve manipular pessoas para que revelem informações confidenciais,
-realizem ações específicas ou forneçam acesso a sistemas, explorando fraquezas humanas em vez de falhas técnicas.
-
-Ela começa pela construção de confiança, obtenção de informações públicas, contatos e aproveitamento de comportamentos naturais das pessoas.
-Pode ocorrer por telefone, email, redes sociais, pessoalmente, etc.
-
-Esta técnica é amplamente utilizada por hackers para obter acesso a contas,
-senhas e dados valiosos sem a necessidade de invasão tecnológica direta.
-
-Quer aprender mais e receber orientação direta? (S/N):
-"""
+        explicacao = (
+            "Engenharia Social é uma técnica que envolve manipular pessoas para que revelem informações confidenciais,\n"
+            "realizem ações específicas ou forneçam acesso a sistemas, explorando fraquezas humanas em vez de falhas técnicas.\n\n"
+            "Ela começa pela construção de confiança, obtenção de informações públicas, contatos e aproveitamento de comportamentos naturais das pessoas.\n"
+            "Pode ocorrer por telefone, email, redes sociais, pessoalmente, etc.\n\n"
+            "Esta técnica é amplamente utilizada por hackers para obter acesso a contas,\n"
+            "senhas e dados valiosos sem a necessidade de invasão tecnológica direta.\n\n"
+            "Quer aprender mais e receber orientação direta? (S/N):"
+        )
         type_writer_lines(f"\033[92m{explicacao}\033[0m", char_speed=0.02, line_pause=1)
         resposta = input(" ").strip().lower()
         while resposta not in ['s', 'n']:

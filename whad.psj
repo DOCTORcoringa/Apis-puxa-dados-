@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-import threading
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -14,22 +13,23 @@ def type_writer(text, speed=0.03, newline=True):
     if newline:
         print()
 
-def progress_bar(total, prefix='', suffix='', length=30, fill='█'):
-    def run():
-        for i in range(total+1):
-            percent = 100 * (i / float(total))
-            filled_length = int(length * i // total)
-            bar = fill * filled_length + '-' * (length - filled_length)
-            print(f'\r{prefix} |{bar}| {percent:.0f}% {suffix}', end='')
-            time.sleep(0.1)
-        print()
-    t = threading.Thread(target=run)
-    t.start()
-    t.join()
+def progress_bar(duration=3.0, length=30):
+    start = time.time()
+    while True:
+        elapsed = time.time() - start
+        percent = min(elapsed / duration, 1.0)
+        filled = int(percent * length)
+        bar = '█' * filled + '-' * (length - filled)
+        sys.stdout.write(f'\r[{bar}] {int(percent*100)}%')
+        sys.stdout.flush()
+        if percent == 1.0:
+            break
+        time.sleep(0.1)
+    print()
 
 def welcome():
     clear_screen()
-    whatsapp_art = r"""
+    banner = r"""
 ╔═══╗──╔╗────╔╗─────────────
 ║╔═╗║──║║────║║─────────────
 ║║─╚╬══╣║╔══╦╝╠══╦═╗╔══╦═╗
@@ -39,61 +39,89 @@ def welcome():
 ────────────────────────╔═╝║ 
 ─────── WhatsApp ────────╚══╝
 """
-    print('\033[92m' + whatsapp_art + '\033[0m')
+    print('\033[92m' + banner + '\033[0m')
     type_writer("Denúncia em Alta Voltagem!", 0.05)
     type_writer("Protegendo sua voz, ligando o alerta!\n", 0.05)
 
 def get_user_name():
     type_writer("Por favor, digite seu nome:", 0.05, False)
     name = input(' ')
-    return name.strip() if name.strip() != '' else 'Usuário'
+    return name.strip() or "Usuário"
 
 def print_menu():
     clear_screen()
     type_writer("===== MENU HACKER STYLE =====\n", 0.02)
-    for i in range(26):
-        letter = chr(65 + i)
-        type_writer(f"{letter}) Abrir WhatsApp - Opção {letter}", 0.01)
-    type_writer("S) Sobre o Sistema")
-    type_writer("Q) Sair\n")
-    type_writer("Digite a letra da opção desejada:", 0.05, False)
+    options = {
+        'A': "Enviar Spam em Massa",
+        'B': "Denunciar Alvo",
+        'C': "Flood de Mensagens",
+        'D': "Ligação Anônima",
+        'E': "Rastreamento de IP",
+        'F': "Ataque de Força Bruta",
+        'G': "Invasão de Conta Social",
+        'H': "Phishing",
+        'I': "Interceptar Comunicação",
+        'J': "Exfiltração de Dados",
+        'K': "Desfigurar Página Web",
+        'L': "Keylogger Ativado",
+        'M': "Controle de Botnet",
+        'N': "Exploração de Vulnerabilidade",
+        'O': "Engenharia Social",
+        'Z': "Contato Criador WhatsApp",
+        'Q': "Sair"
+    }
+    for key in sorted(options.keys()):
+        type_writer(f"{key}) {options[key]}")
+    type_writer("\nDigite a letra da opção desejada:", 0.05, False)
+    return options
 
-def sobre_sistema():
-    clear_screen()
-    type_writer("Sobre o Sistema:", 0.05)
-    type_writer("Este sistema foi criado para ajudar na denúncia de forma rápida e segura.", 0.03)
-    type_writer("Nosso objetivo é proteger sua voz e promover ações contra irregularidades.", 0.03)
-    type_writer("Use as opções do menu para enviar denúncias e outras ações relevantes.\n", 0.03)
-    input("Pressione Enter para voltar ao menu...")
+def get_target_and_quantity(action_name):
+    type_writer(f"Informe o número do alvo para '{action_name}':", 0.05, False)
+    target = input(" ")
+    type_writer(f"Informe a quantidade para '{action_name}':", 0.05, False)
+    quantity = input(" ")
+    return target.strip(), quantity.strip()
 
-def open_whatsapp(option):
-    clear_screen()
-    type_writer(f"Você escolheu a opção {option}.", 0.05)
-    type_writer("Abrindo WhatsApp...", 0.05)
-    # Como não é possível abrir WhatsApp pelo terminal, simulamos com uma mensagem
-    type_writer("Simulando abertura do WhatsApp no link: https://wa.me/message/C7VWPEONV6IJL1", 0.03)
-    type_writer("Pressione Enter para voltar ao menu.", 0.05)
-    input()
+def execute_option(key, options):
+    if key == 'Q':
+        clear_screen()
+        type_writer("Saindo... Obrigado por usar!", 0.05)
+        sys.exit(0)
+    elif key == 'Z':
+        clear_screen()
+        type_writer("Abrindo WhatsApp do criador...", 0.05)
+        os.system('am start -a android.intent.action.VIEW -d "https://wa.me/message/C7VWPEONV6IJL1"')
+        type_writer("\nPressione Enter para voltar ao menu.", 0.05)
+        input()
+    elif key in options:
+        clear_screen()
+        action = options[key]
+        target, quantity = get_target_and_quantity(action)
+        type_writer(f"{action} para {target} na quantidade {quantity} iniciado...\n", 0.05)
+        progress_bar(4.0)
+        success_msgs = [
+            f"{action} concluído com sucesso no alvo {target}!",
+            f"Operação '{action}' finalizada para {target}.",
+            f"Processo '{action}' realizado sem erros para {target}."
+        ]
+        for msg in success_msgs:
+            type_writer(msg, 0.04)
+        type_writer("\nPressione Enter para voltar ao menu...")
+        input()
+    else:
+        type_writer("Opção inválida! Tente novamente.", 0.05)
+        time.sleep(1)
 
 def main():
     welcome()
     user_name = get_user_name()
+    options = print_menu()
     while True:
         clear_screen()
         type_writer(f"Seja bem-vindo, {user_name}!\n", 0.05)
-        print_menu()
-        choice = input(' ').strip().upper()
-        if choice == 'Q':
-            clear_screen()
-            type_writer("Saindo... Obrigado por usar!", 0.05)
-            break
-        elif choice == 'S':
-            sobre_sistema()
-        elif choice in [chr(65 + i) for i in range(26)]:
-            open_whatsapp(choice)
-        else:
-            type_writer("Opção inválida, tente novamente.", 0.05)
-            time.sleep(1)
+        options = print_menu()
+        choice = input(" ").strip().upper()
+        execute_option(choice, options)
 
 if __name__ == "__main__":
     main()

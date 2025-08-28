@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import random
+import subprocess
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -14,6 +15,12 @@ def type_writer(text, speed=0.03, newline=True):
     if newline:
         print()
 
+def type_writer_lines(text, char_speed=0.02, line_pause=0.8):
+    lines = text.strip().split('\n')
+    for line in lines:
+        type_writer(line, speed=char_speed, newline=True)
+        time.sleep(line_pause)
+
 def progress_bar(duration=3.0, length=30):
     start = time.time()
     while True:
@@ -21,15 +28,29 @@ def progress_bar(duration=3.0, length=30):
         percent = min(elapsed / duration, 1.0)
         filled = int(percent * length)
         bar = '█' * filled + '-' * (length - filled)
-        sys.stdout.write(f'\r[{bar}] {int(percent*100)}%')
+        sys.stdout.write(f'\r\033[92m[{bar}] {int(percent*100)}%\033[0m')
         sys.stdout.flush()
         if percent == 1.0:
             break
         time.sleep(0.1)
     print()
 
-def welcome():
-    clear_screen()
+def progress_bar_installacao(duration=5.0):
+    length = 30
+    start = time.time()
+    while True:
+        elapsed = time.time() - start
+        percent = min(elapsed / duration, 1.0)
+        filled = int(percent * length)
+        bar = '█' * filled + '-' * (length - filled)
+        sys.stdout.write(f'\r\033[92mInstalando... [{bar}] {int(percent*100)}%\033[0m')
+        sys.stdout.flush()
+        if percent == 1.0:
+            break
+        time.sleep(0.1)
+    print()
+
+def print_banner_slogan():
     banner = r"""
 ╔═══╗──╔╗────╔╗─────────────
 ║╔═╗║──║║────║║─────────────
@@ -41,17 +62,246 @@ def welcome():
 ─────── WhatsApp ────────╚══╝
 """
     print('\033[92m' + banner + '\033[0m')
-    type_writer("Denúncia em Alta Voltagem!", 0.05)
-    type_writer("Protegendo sua voz, ligando o alerta!\n", 0.05)
+    type_writer("\033[93mDenúncia em Alta Voltagem!\033[0m", 0.05)
+    type_writer("\033[93mProtegendo sua voz, ligando o alerta!\n\033[0m", 0.05)
+
+def print_menu_box(options):
+    lines = [f"{key}) {options[key]}" for key in sorted(options.keys())]
+    width = max(len(line) for line in lines) + 4
+    
+    print('\033[92m' + '╔' + '═' * width + '╗' + '\033[0m')
+    type_writer("\033[92m===== MENU HACKER STYLE =====\033[0m", 0.02)
+    for line in lines:
+        line_padded = line.ljust(width)
+        print(f'\033[92m║ {line_padded} ║\033[0m')
+    print('\033[92m' + '╚' + '═' * width + '╝' + '\033[0m')
+
+    type_writer("\n\033[92mDigite a letra da opção desejada:\033[0m", 0.05, False)
 
 def get_user_name():
-    type_writer("Por favor, digite seu nome:", 0.05, False)
+    print_banner_slogan()
+    type_writer("\033[92mPor favor, digite seu nome:\033[0m", 0.05, False)
     name = input(' ')
     return name.strip() or "Usuário"
 
-def print_menu():
+def get_target_and_quantity(action_name):
+    print_banner_slogan()
+    type_writer(f"\033[92mInforme o número do alvo para '{action_name}':\033[0m", 0.05, False)
+    target = input(" ")
+    type_writer(f"\033[92mInforme a quantidade para '{action_name}':\033[0m", 0.05, False)
+    quantity = input(" ")
+    return target.strip(), quantity.strip()
+
+def get_flood_data():
+    print_banner_slogan()
+    type_writer("\033[92mInforme o número do alvo para 'Flood de Mensagens':\033[0m", 0.05, False)
+    target = input(" ")
+    type_writer("\033[92mDigite a mensagem que deseja enviar:\033[0m", 0.05, False)
+    mensagem = input(" ")
+    type_writer("\033[92mInforme a quantidade de mensagens a enviar:\033[0m", 0.05, False)
+    quantidade = input(" ")
+    return target.strip(), mensagem.strip(), quantidade.strip()
+
+def fake_ip():
+    return f"{random.randint(1,255)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}"
+
+def show_system_info():
     clear_screen()
-    type_writer("===== MENU HACKER STYLE =====\n", 0.02)
+    print_banner_slogan()
+    mensagem = """
+AVISO IMPORTANTE:
+
+Este sistema NÃO tem a capacidade de banir ou bloquear nenhum usuário ou número.
+
+Banir um número não é feito por este programa, nem está dentro da sua programação ou jurisdição.
+
+Ele apenas automatiza o envio de denúncias variadas para um número específico, aumentando a quantidade de denúncias enviadas.
+
+Assim, ajuda a acelerar o processo para que o WhatsApp identifique mais rápido um número potencialmente problemático, 
+por meio da multiplicação automática das denúncias.
+
+Ou seja, este é um auxílio para reforçar as denúncias recebidas pelo WhatsApp, mas o banimento depende exclusivamente da avaliação da plataforma.
+
+Use este sistema com responsabilidade e dentro dos limites legais e éticos.
+
+Inscreva-se, esse código foi baseado pelo meu.
+"""
+    type_writer_lines(f"\033[92m{mensagem}\033[0m")
+
+def fake_chat_exfiltracao(numero):
+    from datetime import datetime, timedelta
+    import random
+
+    clear_screen()
+    print_banner_slogan()
+    type_writer(f"\033[92mIniciando exfiltração de dados para o número: {numero}\033[0m\n", 0.05)
+    time.sleep(1.5)
+
+    emails = ["exemplo@gmail.com", "usuario@yahoo.com", "contato@hotmail.com", "nome.sobrenome@outlook.com"]
+    locais = ["São Paulo, Brasil", "Rio de Janeiro, Brasil", "Belo Horizonte, Brasil", "Porto Alegre, Brasil"]
+
+    email = random.choice(emails)
+    local = random.choice(locais)
+    data_exfiltrada = datetime.now() - timedelta(days=random.randint(1,100))
+
+    type_writer(f"[Sistema] Dados exfiltrados em {data_exfiltrada.strftime('%d/%m/%Y %H:%M:%S')}:\n", 0.03)
+
+    type_writer(f"Nome: Não encontrado", 0.03)
+    type_writer(f"E-mail: {email}", 0.03)
+    type_writer(f"Localização aproximada: {local}", 0.03)
+    type_writer(f"Número de telefone: {numero}\n", 0.03)
+
+    type_writer("Redes sociais associadas: Não encontrado\n", 0.03)
+
+    mensagens = [
+        "Mensagem recebida em segredo.",
+        "Última atividade detectada há 2 dias.",
+        "Comunicações criptografadas registradas.",
+        "Dados de conexão avaliados.",
+        "Nenhuma mensagem pública encontrada."
+    ]
+
+    type_writer("Histórico de mensagens capturadas:", 0.03)
+    n_msgs = random.randint(3, 5)
+    now = datetime.now()
+    for i in range(n_msgs):
+        hora_msg = (now - timedelta(hours=n_msgs - i)).strftime("%H:%M")
+        msg = random.choice(mensagens)
+        type_writer(f"[{hora_msg}] Mensagem: {msg}", 0.02)
+    type_writer("")
+
+    type_writer("[Sistema] Exfiltração concluída.", 0.05)
+    type_writer("\nPressione Enter para voltar ao menu.", 0.05)
+    input()
+
+def is_python_installed():
+    try:
+        subprocess.run(['python3', '--version'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return True
+    except Exception:
+        return False
+
+def install_essential_tools():
+    clear_screen()
+    print_banner_slogan()
+    type_writer_lines("\033[92mPara executar este script, você precisa das seguintes ferramentas instaladas no Termux:\n1) Atualizar sistema (pkg update && pkg upgrade)\n2) Instalar Python (pkg install python)\n\033[0m")
+    type_writer("\033[92mDeseja instalar automaticamente essas ferramentas? (S/N):\033[0m", 0.05, False)
+    resposta = input(" ").strip().lower()
+    
+    if resposta == 's':
+        type_writer("\n\033[92mIniciando atualização do sistema...\033[0m", 0.05)
+        progress_bar_installacao(duration=4)
+        os.system('pkg update -y && pkg upgrade -y')
+        
+        type_writer("\n\033[92mInstalando Python...\033[0m", 0.05)
+        progress_bar_installacao(duration=3)
+        os.system('pkg install python -y')
+        
+        type_writer("\n\033[92mInstalação concluída! Reinicie o Termux para garantir o funcionamento.\033[0m")
+        type_writer("\033[92mPressione Enter para continuar...\033[0m")
+        input()
+    else:
+        type_writer("\033[92mVocê pode instalar manualmente executando:\n", 0.05)
+        type_writer("pkg update && pkg upgrade", 0.05)
+        type_writer("pkg install python\n", 0.05)
+        type_writer("Pressione Enter para continuar...\033[0m", 0.05)
+        input()
+
+def execute_option(key, options, user_name):
+    if key == 'Q':
+        clear_screen()
+        print_banner_slogan()
+        type_writer("\033[92mSaindo... Obrigado por usar!\033[0m", 0.05)
+        sys.exit(0)
+    elif key == 'Z':
+        clear_screen()
+        print_banner_slogan()
+        type_writer("\033[92mAbrindo WhatsApp do criador...\033[0m", 0.05)
+        os.system('am start -a android.intent.action.VIEW -d "https://wa.me/message/C7VWPEONV6IJL1"')
+        type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m", 0.05)
+        input()
+    elif key == 'S':
+        show_system_info()
+    elif key == 'C':  # Flood de Mensagens com mensagem personalizada
+        target, mensagem, quantidade = get_flood_data()
+        clear_screen()
+        print_banner_slogan()
+        type_writer(f"\033[92mIniciando Flood de Mensagens para {target}...\n\033[0m", 0.05)
+        progress_bar(3.5)
+        try:
+            qtd = int(quantidade)
+        except:
+            qtd = 1
+        for i in range(qtd):
+            type_writer(f"\033[92m[{i+1}/{qtd}] Enviando para {target}: {mensagem}\033[0m", 0.01)
+        type_writer(f"\n\033[92mFlood de mensagens concluído com sucesso no alvo {target}!\033[0m", 0.05)
+        type_writer("\n\033[92mPressione Enter para voltar ao menu...\033[0m")
+        input()
+    elif key == 'J':  # Exfiltração de Dados (fake chat)
+        clear_screen()
+        print_banner_slogan()
+        type_writer("\033[92mInforme o número alvo para exfiltração:\033[0m", 0.05, False)
+        numero = input(" ").strip()
+        fake_chat_exfiltracao(numero)
+    elif key == 'O':  # Engenharia Social explicação e direcionamento WhatsApp
+        clear_screen()
+        print_banner_slogan()
+        explicacao = """
+Engenharia Social é uma técnica que envolve manipular pessoas para que revelem informações confidenciais,
+realizem ações específicas ou forneçam acesso a sistemas, explorando fraquezas humanas em vez de falhas técnicas.
+
+Ela começa pela construção de confiança, obtenção de informações públicas, contatos e aproveitamento de comportamentos naturais das pessoas.
+Pode ocorrer por telefone, email, redes sociais, pessoalmente, etc.
+
+Esta técnica é amplamente utilizada por hackers para obter acesso a contas,
+senhas e dados valiosos sem a necessidade de invasão tecnológica direta.
+
+Quer aprender mais e receber orientação direta? (S/N):
+"""
+        type_writer_lines(f"\033[92m{explicacao}\033[0m", char_speed=0.02, line_pause=1)
+        resposta = input(" ").strip().lower()
+        while resposta not in ['s', 'n']:
+            type_writer("\033[92mResposta inválida! Digite 'S' para Sim ou 'N' para Não:\033[0m", 0.02, False)
+            resposta = input(" ").strip().lower()
+        if resposta == 's':
+            clear_screen()
+            print_banner_slogan()
+            type_writer("\033[92mAbrindo WhatsApp do criador para você...\033[0m", 0.05)
+            os.system('am start -a android.intent.action.VIEW -d "https://wa.me/message/C7VWPEONV6IJL1"')
+            type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m", 0.05)
+            input()
+    else:
+        clear_screen()
+        print_banner_slogan()
+        if key in options:
+            action = options[key]
+            target, quantity = get_target_and_quantity(action)
+            type_writer(f"\033[92m{action} para {target} na quantidade {quantity} iniciado...\n\033[0m", 0.05)
+            progress_bar(3.5)
+
+            if key == 'E':  # Rastreamento IP
+                ip = fake_ip()
+                type_writer(f"\033[92mAlvo {target} localizado. IP aproximadamente: {ip}\033[0m", 0.05)
+            elif key == 'G':  # Invasão conta social
+                redes = ["WhatsApp", "Facebook", "Instagram", "Twitter", "Nenhuma rede social encontrada"]
+                rede = random.choice(redes)
+                type_writer(f"\033[92mO número {target} está integrado na rede social: {rede}\033[0m", 0.05)
+            elif key == 'D':  # Ligação anônima
+                type_writer(f"\033[92mLigações anônimas iniciadas para {target}, totalizando {quantity} chamadas.\033[0m", 0.05)
+            elif key == 'B':  # Denunciar
+                type_writer(f"\033[92mDenúncia registrada para {target} com sucesso.\033[0m", 0.05)
+            else:
+                type_writer(f"\033[92m{action} concluído com sucesso no alvo {target}!\033[0m", 0.05)
+
+            type_writer("\n\033[92mPressione Enter para voltar ao menu...\033[0m")
+            input()
+        else:
+            type_writer("\033[92mOpção inválida! Tente novamente.\033[0m", 0.05)
+            time.sleep(1)
+
+def main():
+    welcome()
+    user_name = get_user_name()
     options = {
         'A': "Enviar Spam em Massa",
         'B': "Denunciar Alvo",
@@ -68,73 +318,23 @@ def print_menu():
         'M': "Controle de Botnet",
         'N': "Exploração de Vulnerabilidade",
         'O': "Engenharia Social",
+        'S': "Sobre o Sistema",
         'Z': "Contato Criador WhatsApp",
         'Q': "Sair"
     }
-    for key in sorted(options.keys()):
-        type_writer(f"{key}) {options[key]}")
-    type_writer("\nDigite a letra da opção desejada:", 0.05, False)
-    return options
-
-def get_target_and_quantity(action_name):
-    type_writer(f"Informe o número do alvo para '{action_name}':", 0.05, False)
-    target = input(" ")
-    type_writer(f"Informe a quantidade para '{action_name}':", 0.05, False)
-    quantity = input(" ")
-    return target.strip(), quantity.strip()
-
-def fake_ip():
-    return f"{random.randint(1,255)}.{random.randint(0,255)}.{random.randint(0,255)}.{random.randint(1,254)}"
-
-def execute_option(key, options):
-    if key == 'Q':
-        clear_screen()
-        type_writer("Saindo... Obrigado por usar!", 0.05)
-        sys.exit(0)
-    elif key == 'Z':
-        clear_screen()
-        type_writer("Abrindo WhatsApp do criador...", 0.05)
-        os.system('am start -a android.intent.action.VIEW -d "https://wa.me/message/C7VWPEONV6IJL1"')
-        type_writer("\nPressione Enter para voltar ao menu.", 0.05)
-        input()
-    elif key in options:
-        clear_screen()
-        action = options[key]
-        target, quantity = get_target_and_quantity(action)
-        type_writer(f"{action} para {target} na quantidade {quantity} iniciado...\n", 0.05)
-        progress_bar(3.5)
-
-        # Resultados simulados diferentes por opção
-        if key == 'E':  # Rastreamento IP
-            ip = fake_ip()
-            type_writer(f"Alvo {target} localizado. IP approximado: {ip}", 0.05)
-        elif key == 'G': # Invasão conta social
-            redes = ["WhatsApp","Facebook","Instagram","Twitter","Nenhuma rede social encontrada"]
-            rede = random.choice(redes)
-            type_writer(f"O número {target} está integrado na rede social: {rede}", 0.05)
-        elif key == 'D': # Ligação anônima
-            type_writer(f"Ligações anônimas iniciadas para {target}, totalizando {quantity} chamadas.", 0.05)
-        elif key == 'B': # Denunciar
-            type_writer(f"Denúncia registrada para {target} com sucesso.", 0.05)
-        else:
-            type_writer(f"{action} concluído com sucesso no alvo {target}!", 0.05)
-
-        type_writer("\nPressione Enter para voltar ao menu...")
-        input()
-    else:
-        type_writer("Opção inválida! Tente novamente.", 0.05)
-        time.sleep(1)
-
-def main():
-    welcome()
-    user_name = get_user_name()
-    options = print_menu()
     while True:
         clear_screen()
-        type_writer(f"Seja bem-vindo, {user_name}!\n", 0.05)
-        options = print_menu()
+        print_banner_slogan()
+        type_writer(f"\033[92mSeja bem-vindo, {user_name}!\n\033[0m", 0.05)
+        print_menu_box(options)
         choice = input(" ").strip().upper()
-        execute_option(choice, options)
+        execute_option(choice, options, user_name)
+
+def welcome():
+    clear_screen()
+    print_banner_slogan()
 
 if __name__ == "__main__":
+    if not is_python_installed():
+        install_essential_tools()
     main()

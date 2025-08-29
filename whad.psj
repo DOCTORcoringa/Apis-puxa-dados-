@@ -5,10 +5,8 @@ import random
 import subprocess
 import json
 
-# Controle da versão do banner/slogan
 use_updated_slogan = False
 
-# Funções para gerenciamento dos usuários e seu histórico
 def carregar_usuarios():
     if os.path.exists("usuarios.json"):
         with open("usuarios.json", "r") as f:
@@ -19,8 +17,7 @@ def salvar_usuarios(usuarios):
     with open("usuarios.json", "w") as f:
         json.dump(usuarios, f, indent=4)
 
-def obter_nome_usuario():
-    usuarios = carregar_usuarios()
+def obter_nome_usuario(usuarios):
     while True:
         nome = input("Digite seu nome: ").strip()
         if nome:
@@ -37,10 +34,10 @@ def obter_nome_usuario():
     return nome, usuarios
 
 def salvar_ultima_opcao(nome, opcao, usuarios):
-    usuarios[nome]["ultima_opcao"] = opcao
-    salvar_usuarios(usuarios)
+    if nome:
+        usuarios[nome]["ultima_opcao"] = opcao
+        salvar_usuarios(usuarios)
 
-# Função para checar instalação do Python no Termux
 def is_python_installed():
     try:
         subprocess.run(['python3', '--version'], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -260,7 +257,8 @@ def fake_chat_exfiltracao(numero):
     input()
 
 def execute_option(key, options, user_name, usuarios):
-    salvar_ultima_opcao(user_name, key, usuarios)  # Salvar última opção usada
+    if user_name:
+        salvar_ultima_opcao(user_name, key, usuarios)  # Salvar última opção usada
     
     if key == 'Q':
         clear_screen()
@@ -271,7 +269,7 @@ def execute_option(key, options, user_name, usuarios):
         update_system()
     elif key == 'S':
         show_system_info()
-    elif key == 'C':  # Flood de Mensagens com mensagem personalizada
+    elif key == 'C':
         target, mensagem, quantidade = get_flood_data()
         clear_screen()
         print_banner_slogan()
@@ -286,27 +284,25 @@ def execute_option(key, options, user_name, usuarios):
         type_writer(f"\n\033[92mFlood de mensagens concluído com sucesso no alvo {target}!\033[0m", 0.05)
         type_writer("\n\033[92mPressione Enter para voltar ao menu...\033[0m")
         input()
-    elif key == 'J':  # Exfiltração de Dados (fake chat)
+    elif key == 'J':
         clear_screen()
         type_writer("\033[92mInforme o número alvo para exfiltração:\033[0m", 0.05, False)
         numero = input(" ").strip()
         fake_chat_exfiltracao(numero)
-    elif key == 'O':  # Engenharia Social explicação e direcionamento WhatsApp
+    elif key == 'O':
         clear_screen()
-        explicacao = (
-            "Engenharia Social é uma técnica que envolve manipular pessoas\n"
-            "para que revelem informações confidenciais,\n"
-            "realizem ações específicas ou forneçam acesso a sistemas,\n"
-            "explorando fraquezas humanas em vez de falhas técnicas.\n\n"
-            "Ela começa pela construção de confiança,\n"
-            "obtenção de informações públicas, contatos\n"
-            "e aproveitamento de comportamentos naturais das pessoas.\n"
-            "Pode ocorrer por telefone, email, redes sociais, pessoalmente, etc.\n\n"
-            "Esta técnica é amplamente utilizada por hackers\n"
-            "para obter acesso a contas, senhas e dados valiosos\n"
-            "sem a necessidade de invasão tecnológica direta.\n\n"
-            "Quer aprender mais e receber orientação direta? (S/N):"
-        )
+        explicacao = ("Engenharia Social é uma técnica que envolve manipular pessoas\n"
+                     "para que revelem informações confidenciais,\n"
+                     "realizem ações específicas ou forneçam acesso a sistemas,\n"
+                     "explorando fraquezas humanas em vez de falhas técnicas.\n\n"
+                     "Ela começa pela construção de confiança,\n"
+                     "obtenção de informações públicas, contatos\n"
+                     "e aproveitamento de comportamentos naturais das pessoas.\n"
+                     "Pode ocorrer por telefone, email, redes sociais, pessoalmente, etc.\n\n"
+                     "Esta técnica é amplamente utilizada por hackers\n"
+                     "para obter acesso a contas, senhas e dados valiosos\n"
+                     "sem a necessidade de invasão tecnológica direta.\n\n"
+                     "Quer aprender mais e receber orientação direta? (S/N):")
         type_writer_lines(f"\033[92m{explicacao}\033[0m", char_speed=0.02, line_pause=1)
         resposta = input(" ").strip().lower()
         while resposta not in ['s', 'n']:
@@ -319,6 +315,26 @@ def execute_option(key, options, user_name, usuarios):
             os.system('am start -a android.intent.action.VIEW -d "https://wa.me/message/C7VWPEONV6IJL1"')
             type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m", 0.05)
             input()
+    elif key == 'LAST':  # nova opção para mostrar última ação
+        if user_name:
+            ultima = usuarios[user_name].get("ultima_opcao")
+            clear_screen()
+            print_banner_slogan()
+            if ultima:
+                type_writer(f"\033[92mSua última ação foi: {ultima}\033[0m", 0.05)
+            else:
+                type_writer("\033[92mNenhuma ação registrada ainda.\033[0m", 0.05)
+            type_writer("\n\033[92mPressione Enter para voltar ao menu.\033[0m")
+            input()
+        else:
+            clear_screen()
+            print_banner_slogan()
+            type_writer("\033[92mAinda não está logado. Por favor, selecione a opção L para se identificar.\033[0m\n", 0.05)
+            type_writer("Pressione Enter para voltar ao menu.", 0.05)
+            input()
+    elif key == 'L':  # nova opção para login/identificação
+        nome, usuarios = obter_nome_usuario(usuarios)
+        return nome, usuarios  # retorno para atualizar o user_name na main
     else:
         clear_screen()
         print_banner_slogan()
@@ -328,16 +344,16 @@ def execute_option(key, options, user_name, usuarios):
             type_writer(f"\033[92m{action} para {target} na quantidade {quantity} iniciado...\n\033[0m", 0.05)
             progress_bar(3.5)
 
-            if key == 'E':  # Rastreamento IP
+            if key == 'E':
                 ip = fake_ip()
                 type_writer(f"\033[92mAlvo {target} localizado. IP aproximadamente: {ip}\033[0m", 0.05)
-            elif key == 'G':  # Invasão conta social
+            elif key == 'G':
                 redes = ["WhatsApp", "Facebook", "Instagram", "Twitter", "Nenhuma rede social encontrada"]
                 rede = random.choice(redes)
                 type_writer(f"\033[92mO número {target} está integrado na rede social: {rede}\033[0m", 0.05)
-            elif key == 'D':  # Ligação anônima
+            elif key == 'D':
                 type_writer(f"\033[92mLigações anônimas iniciadas para {target}, totalizando {quantity} chamadas.\033[0m", 0.05)
-            elif key == 'B':  # Denunciar
+            elif key == 'B':
                 type_writer(f"\033[92mDenúncia registrada para {target} com sucesso.\033[0m", 0.05)
             else:
                 type_writer(f"\033[92m{action} concluído com sucesso no alvo {target}!\033[0m", 0.05)
@@ -348,10 +364,14 @@ def execute_option(key, options, user_name, usuarios):
             type_writer("\033[92mOpção inválida! Tente novamente.\033[0m", 0.05)
             time.sleep(1)
 
+    return user_name, usuarios
+
 def main():
     global use_updated_slogan
-    load_update_flag()  # Carrega estado salvo da atualização
-    user_name, usuarios = obter_nome_usuario()
+    load_update_flag()
+    usuarios = carregar_usuarios()
+    user_name = None  # usuário começa não logado
+
     options = {
         'A': "Enviar Spam em Massa",
         'B': "Denunciar Alvo",
@@ -364,7 +384,8 @@ def main():
         'I': "Interceptar Comunicação",
         'J': "Exfiltração de Dados",
         'K': "Desfigurar Página Web",
-        'L': "Keylogger Ativado",
+        'L': "Identificar/Login Usuário",  # opção nova para login
+        'LAST': "Mostrar Minha Última Ação",  # opção para última ação
         'M': "Controle de Botnet",
         'N': "Exploração de Vulnerabilidade",
         'O': "Engenharia Social",
@@ -373,16 +394,31 @@ def main():
         'Z': "Contato Criador WhatsApp",
         'Q': "Sair"
     }
+
     while True:
         clear_screen()
         print_banner_slogan()
-        type_writer(f"\033[92mSeja bem-vindo, {user_name}!\n\033[0m", 0.05)
+        # Mostrar mensagem de boas-vindas se usuário estiver logado
+        if user_name:
+            type_writer(f"\033[92mSeja bem-vindo, {user_name}!\n\033[0m", 0.05)
+            ultima_opcao = usuarios[user_name].get("ultima_opcao")
+            if ultima_opcao:
+                type_writer(f"\033[93mSua última opção usada foi: {ultima_opcao}\033[0m\n", 0.05)
+        else:
+            type_writer("\033[93mVocê ainda não se identificou (opção L para login).\033[0m\n", 0.05)
         print_menu_box(options)
         choice = input(" ").strip().upper()
-        execute_option(choice, options, user_name, usuarios)
+        result = execute_option(choice, options, user_name, usuarios)
+        # Possível atualização do usuário e usuários no login
+        if isinstance(result, tuple):
+            user_name, usuarios = result
 
 def print_menu_box(options):
-    lines = [f"{key}) {options[key]}" for key in sorted(options.keys())]
+    # Mostrar opções organizadas (ordenar ignorando 'LAST' que é especial)
+    sorted_keys = sorted([k for k in options if k != 'LAST'])
+    # Incluir LAST no final da lista antes de Q
+    sorted_keys.append('LAST')
+    lines = [f"{key}) {options[key]}" for key in sorted_keys]
     width = max(len(line) for line in lines) + 4
     
     print('\033[92m' + '╔' + '═' * width + '╗' + '\033[0m')
